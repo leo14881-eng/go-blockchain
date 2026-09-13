@@ -1,0 +1,22 @@
+# 编译产物目录(go build 输出到此)
+/bin/
+
+# 单独的可执行文件
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# 测试与覆盖率产物
+*.test
+*.out
+coverage.txt
+
+# Go 工作区文件
+go.work
+go.work.sum
+
+# 编辑器 / IDE
+.idea/
+.vscode/
