@@ -45,5 +45,38 @@ func (bc *Blockchain) PrintChain() {
 		fmt.Printf("数据:     %s\n", block.Data)
 		fmt.Printf("前块哈希: %s\n", block.PrevHash)
 		fmt.Printf("本块哈希: %s\n\n", block.Hash)
+		fmt.Printf("Nonce:    %d\n\n", block.Nonce) // 新增
 	}
+}
+
+// IsValid:校验整条链是否完整、未被篡改
+// 返回 true = 链合法;false = 检测到篡改
+func (bc *Blockchain) IsValid() bool {
+
+	valid := true // 先假设合法,发现问题就标记为 false,但不立即退出
+
+	// ===== 先单独校验创世区块(下标0)=====
+	genesis := bc.Blocks[0]
+	powGenesis := NewProofOfWork(genesis)
+	if !powGenesis.Validate() {
+		fmt.Printf("[篡改提醒] 创世区块(区块0)被篡改!\n")
+		valid = false
+	}
+
+	// ===== 再校验后续每个块 =====
+	for i := 1; i < len(bc.Blocks); i++ {
+		currentBlock := bc.Blocks[i]
+		prevBlock := bc.Blocks[i-1]
+
+		// 检查①:哈希是否合法
+		pow := NewProofOfWork(currentBlock)
+		// 哈希对不上自己 或 和前块链接断了 —— 都是被篡改
+		if !pow.Validate() || currentBlock.PrevHash != prevBlock.Hash {
+			fmt.Printf("[篡改提醒] 区块 %d 被篡改!\n", i)
+			valid = false
+		}
+
+	}
+
+	return valid // 全部查完再返回
 }

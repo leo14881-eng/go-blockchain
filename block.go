@@ -12,6 +12,7 @@ type Block struct {
 	Data      string // 首字母小写 = private（仅包内可见）
 	PrevHash  string
 	Hash      string
+	Nonce     int // 新增：挖矿试出来的那个数字
 }
 
 // SetHash 是 Block 的方法。(b *Block) 叫"接收者"，相当于 Java 的 this
@@ -28,6 +29,12 @@ func NewBlock(data string, prevHash string) *Block {
 		Data:      data,
 		PrevHash:  prevHash,
 	}
-	b.SetHash()
+	//b.SetHash() 不再用 SetHash()，改成挖矿
+	pow := NewProofOfWork(b) // 创建挖矿器
+	nonce, hash := pow.Run() // 开挖！返回挖到的 nonce 和哈希
+
+	b.Nonce = nonce // 记录挖矿结果
+	b.Hash = hash
+
 	return b
 }
